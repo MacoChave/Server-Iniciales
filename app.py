@@ -13,8 +13,6 @@ app.config['MYSQL_DB'] = 'cursos_ingenieria'
 
 mysql = MySQL(app)
 
-
-
 @app.route('/registro', methods=['POST'])
 def registro():
 
@@ -57,9 +55,7 @@ def registro():
 					"success": "false",
 					"msg": "Usuario ya registrado"
 				}
-			)
-			
-			
+			)			
 
 @app.route('/', methods=['GET'])
 def index():
