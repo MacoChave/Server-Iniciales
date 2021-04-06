@@ -55,7 +55,73 @@ def registro():
 					"success": "false",
 					"msg": "Usuario ya registrado"
 				}
-			)			
+			)
+
+@app.route('/perfil', methods=['GET'])
+def perfil():
+
+	identifier = request.args.get("identifier",None)
+
+	try:
+	
+		cur = mysql.connection.cursor()
+		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
+		data = cur.fetchall()
+
+		return jsonify(
+			{
+				"success": "true",
+				"msg": "Información del Usuario"
+			},
+			{
+				"identifier": data[0][0],
+				"names": data[0][1],
+				"surNames": data[0][2],
+				"email": data[0][3],
+				"photoUrl": data[0][4]
+			}
+		)
+			
+
+	except:
+
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Usuario no encontrado"
+			}
+		)
+
+@app.route('/modificar-usuario', methods=['POST'])
+def modificar_usuario():
+	
+	if request.method == 'POST':
+
+		identifier = request.args.get("identifier",None)
+
+		names = request.json['names']
+		surNames = request.json['surNames']
+		email = request.json['email']
+		photoUrl = request.json['photoUrl']
+		password = request.json['password']
+
+		cur = mysql.connection.cursor()
+		cur.execute("""
+			UPDATE usuarios
+			SET names = %s,
+				surNames = %s,
+				email = %s,
+				photoUrl = %s,
+				password = %s
+			WHERE identifier = %s	
+			""", (names, surNames, email, photoUrl, password, identifier))
+
+		return {
+			"estado": "Exitoso"
+		}
+
+
+
 
 @app.route('/', methods=['GET'])
 def index():
