@@ -305,6 +305,44 @@ def listado_cursos():
 				}
 			)
 	
+@app.route('/listado-catedraticos', methods=['GET'])
+def listado_catedraticos():
+
+	try:
+
+		cur = mysql.connection.cursor()
+		cur.execute('SELECT * FROM catedratico')
+		data = cur.fetchall()
+		listaCatedraticos = []
+
+		for i in data:
+
+			catedratico = {
+				"registro": i[0],
+				"nombre": i[1],
+			}
+
+			listaCatedraticos.append(catedratico)
+
+		return jsonify(
+			{
+				"success": "true",
+				"msg": "Listado de Cursos en el Sistema"
+
+			},
+			listaCatedraticos
+		)
+
+	except:
+
+		return jsonify(
+				{
+					"success": "false",
+					"msg": "Ocurrió un Error al envíar el listado de Catedráticos"
+				}
+			)
+
+
 
 @app.route('/', methods=['GET'])
 def index():
