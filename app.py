@@ -2,11 +2,13 @@ from flask import Flask,request, jsonify
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 import json
+from datetime import date
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['MYSQL_HOST'] = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com/'
+app.config['MYSQL_HOST'] = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com'
 app.config['MYSQL_USER'] = 'iniciales'
 app.config['MYSQL_PASSWORD'] = 'iniciales'
 app.config['MYSQL_DB'] = 'db'
@@ -236,12 +238,12 @@ def creacion_publicacion():
 			identifier = request.json['identifier']
 			teacherIdentifier = request.json['teacherIdentifier']
 			idCurse = request.json['idCurse']
-			comment = request.json['comment']
-	
+			msg = request.json['comment']
+		    dateToday = date.today()
 
 			cur = mysql.connection.cursor()
-			cur.execute("""INSERT INTO Publicacion (cod_publicacion, Registro_académico, registro, codigo_curso)
-				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, teacherIdentifier, idCurse, comment))
+			cur.execute("""INSERT INTO Publicacion (Registro_académico, registro, codigo_curso)
+				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, teacherIdentifier, idCurse))
 
 			mysql.connection.commit()
 
@@ -267,6 +269,44 @@ def creacion_publicacion():
 					"msg": "Ocurrió un error con la publicación"
 				}
 			)
+
+@app.route('/crear-comentario', methods=['POST'])
+def crear_comentario():
+	
+	try:
+
+		identifier = request.json['identifier']
+		comment = request.json['comment']
+		dateToday = date.today()
+
+		cur = mysql.connection.cursor()
+		cur.execute("""INSERT INTO Comentario (Registro_académico, comentario, fecha)
+			VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, comment, dateToday))
+
+		mysql.connection.commit()
+
+		return jsonify(
+			{
+				"success": "true",
+				"msg": "Comentario Realizada con Éxito"
+
+			},
+			{
+				"identifier": identifier,
+				"comment" = comment
+			}
+			)
+				
+		except:
+
+			return jsonify(
+				{
+					"success": "false",
+					"msg": "Ocurrió un error con agregar un nuevo comentario"
+				}
+			)
+
+
 
 @app.route('/listado-cursos', methods=['GET'])
 def listado_cursos():
