@@ -28,8 +28,8 @@ def registro():
 			password = request.json['password']
 
 			cur = mysql.connection.cursor()
-			cur.execute('INSERT INTO usuarios (identifier, names, surNames, email, photoUrl, password) VALUES(%s, %s, %s, %s, %s, %s)',
-			(identifier, names, surNames, email, photoUrl, password))
+			cur.execute("""INSERT INTO usuarios (Registro_académico, Nombres, Apellidos, Correo_electrónico, Foto, Contraseña)
+				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, names, surNames, email, photoUrl, password))
 
 			mysql.connection.commit()
 
@@ -65,7 +65,7 @@ def perfil():
 	try:
 	
 		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
+		cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
 		data = cur.fetchall()
 
 		return jsonify(
@@ -92,84 +92,89 @@ def perfil():
 			}
 		)
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])
 def login():
 
-	identifier = request.json['identifier']
-	password = request.json['password']
+	if request.method == 'POST':
 
-	try:
-		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
-		data = cur.fetchall()
 
-		if data[0][5] == password:
+		identifier = request.json['identifier']
+		password = request.json['password']
+
+		try:
+			cur = mysql.connection.cursor()
+			cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
+			data = cur.fetchall()
+
+			if data[0][5] == password:
+
+				return jsonify(
+					{
+						"success": "true",
+						"msg": "Inicio Sesión: " + identifier
+					}
+				)
+		
+			return jsonify(
+				{
+					"success": "false",
+					"msg": "Contraseña Incorrecta"
+				}
+			)
+
+		except:
 
 			return jsonify(
 				{
-					"success": "true",
-					"msg": "Inicio Sesión: " + identifier
+					"success": "false",
+					"msg": "Usuario no Encontrado"
 				}
 			)
-		
-		return jsonify(
-			{
-				"success": "false",
-				"msg": "Contraseña Incorrecta"
-			}
-		)
 
-	except:
-
-		return jsonify(
-			{
-				"success": "false",
-				"msg": "Usuario no Encontrado"
-			}
-		)
-
-@app.route('/recuperar-cuenta', methods=['GET'])
+@app.route('/recuperar-cuenta', methods=['POST'])
 def recuperar_cuenta():
 
-	identifier = request.json['identifier']
-	email = request.json['email']
+	if request.method == 'POST':
 
-	try:
-		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
-		data = cur.fetchall()
+		identifier = request.json['identifier']
+		email = request.json['email']
 
-		if data[0][3] == email:
+		try:
+			cur = mysql.connection.cursor()
+			cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
+			data = cur.fetchall()
+
+			if data[0][3] == email:
+
+				return jsonify(
+					{
+						"success": "true",
+						"msg": "Se encontró el Usuario"
+					},
+					{
+						"identifier": data[0][0],
+						"names": data[0][1],
+						"surNames": data[0][2],
+						"email": data[0][3],
+						"password": data[0][5]
+					}
+				)
+		
+			return jsonify(
+				{
+					"success": "false",
+					"msg": "Email ingresado incorrectamente"
+				}
+			)
+
+		except:
 
 			return jsonify(
 				{
-					"success": "true",
-					"msg": "Se encontró el Usuario"
-				},
-				{
-					"identifier": data[0][0],
-					"names": data[0][1],
-					"surNames": data[0][2],
-					"email": data[0][3],
-					"password": data[0][5]
+					"success": "false",
+					"msg": "Usuario no Encontrado"
 				}
 			)
-		
-		return jsonify(
-			{
-				"success": "false",
-				"msg": "Email ingresado incorrectamente"
-			}
-		)
-
-	except:
-
-		return jsonify(
-			{
-				"success": "false",
-				"msg": "Usuario no Encontrado"
-			}
-		)
 
 @app.route('/modificar-usuario', methods=['POST'])
 def modificar_usuario():
@@ -188,12 +193,12 @@ def modificar_usuario():
 			cur = mysql.connection.cursor()
 			cur.execute("""
 				UPDATE usuarios
-				SET names = %s,
-					surNames = %s,
-					email = %s,
-					photoUrl = %s,
-					password = %s
-				WHERE identifier = %s	
+				SET Nombres = %s,
+					Apellidos = %s,
+					Correo_electrónico = %s,
+					Foto = %s,
+					Contraseña = %s
+				WHERE Registro_académico = %s	
 				""", (names, surNames, email, photoUrl, password, identifier))
 
 			mysql.connection.commit()
