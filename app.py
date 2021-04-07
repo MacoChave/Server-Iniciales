@@ -128,6 +128,49 @@ def login():
 			}
 		)
 
+@app.route('/recuperar-cuenta', methods=['GET'])
+def recuperar_cuenta():
+
+	identifier = request.json['identifier']
+	email = request.json['email']
+
+	try:
+		cur = mysql.connection.cursor()
+		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
+		data = cur.fetchall()
+
+		if data[0][3] == email:
+
+			return jsonify(
+				{
+					"success": "true",
+					"msg": "Se encontró el Usuario"
+				},
+				{
+					"identifier": data[0][0],
+					"names": data[0][1],
+					"surNames": data[0][2],
+					"email": data[0][3],
+					"password": data[0][5]
+				}
+			)
+		
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Email ingresado incorrectamente"
+			}
+		)
+
+	except:
+
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Usuario no Encontrado"
+			}
+		)
+
 @app.route('/modificar-usuario', methods=['POST'])
 def modificar_usuario():
 	
