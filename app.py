@@ -6,10 +6,10 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '441320'
-app.config['MYSQL_DB'] = 'cursos_ingenieria'
+app.config['MYSQL_HOST'] = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com/'
+app.config['MYSQL_USER'] = 'iniciales'
+app.config['MYSQL_PASSWORD'] = 'iniciales'
+app.config['MYSQL_DB'] = 'db'
 
 mysql = MySQL(app)
 
@@ -28,7 +28,7 @@ def registro():
 			password = request.json['password']
 
 			cur = mysql.connection.cursor()
-			cur.execute("""INSERT INTO usuarios (Registro_académico, Nombres, Apellidos, Correo_electrónico, Foto, Contraseña)
+			cur.execute("""INSERT INTO Usuario (Registro_académico, Nombres, Apellidos, Correo_electrónico, Foto, Contraseña)
 				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, names, surNames, email, photoUrl, password))
 
 			mysql.connection.commit()
@@ -65,7 +65,7 @@ def perfil():
 	try:
 	
 		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
+		cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
 		data = cur.fetchall()
 
 		return jsonify(
@@ -103,7 +103,7 @@ def login():
 
 		try:
 			cur = mysql.connection.cursor()
-			cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
+			cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
 			data = cur.fetchall()
 
 			if data[0][5] == password:
@@ -141,7 +141,7 @@ def recuperar_cuenta():
 
 		try:
 			cur = mysql.connection.cursor()
-			cur.execute('SELECT * FROM usuarios WHERE Registro_académico = {0}'.format(identifier))
+			cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
 			data = cur.fetchall()
 
 			if data[0][3] == email:
@@ -192,7 +192,7 @@ def modificar_usuario():
 
 			cur = mysql.connection.cursor()
 			cur.execute("""
-				UPDATE usuarios
+				UPDATE Usuario
 				SET Nombres = %s,
 					Apellidos = %s,
 					Correo_electrónico = %s,
@@ -274,7 +274,7 @@ def listado_cursos():
 	try:
 
 		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM catedra')
+		cur.execute('SELECT * FROM Catedra')
 		data = cur.fetchall()
 		listaCursos = []
 
@@ -311,7 +311,7 @@ def listado_catedraticos():
 	try:
 
 		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM catedratico')
+		cur.execute('SELECT * FROM Catedrático')
 		data = cur.fetchall()
 		listaCatedraticos = []
 
