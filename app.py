@@ -13,6 +13,7 @@ app.config['MYSQL_USER'] = 'iniciales'
 app.config['MYSQL_PASSWORD'] = 'iniciales'
 app.config['MYSQL_DB'] = 'db'
 
+
 mysql = MySQL(app)
 
 @app.route('/registro', methods=['POST'])
