@@ -92,6 +92,42 @@ def perfil():
 			}
 		)
 
+@app.route('/login', methods=['GET'])
+def login():
+
+	identifier = request.json['identifier']
+	password = request.json['password']
+
+	try:
+		cur = mysql.connection.cursor()
+		cur.execute('SELECT * FROM usuarios WHERE identifier = {0}'.format(identifier))
+		data = cur.fetchall()
+
+		if data[0][5] == password:
+
+			return jsonify(
+				{
+					"success": "true",
+					"msg": "Inicio Sesión: " + identifier
+				}
+			)
+		
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Contraseña Incorrecta"
+			}
+		)
+
+	except:
+
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Usuario no Encontrado"
+			}
+		)
+
 @app.route('/modificar-usuario', methods=['POST'])
 def modificar_usuario():
 	
