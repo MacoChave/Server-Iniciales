@@ -268,6 +268,43 @@ def creacion_publicacion():
 				}
 			)
 
+@app.route('/listado-cursos', methods=['GET'])
+def listado_cursos():
+
+	try:
+
+		cur = mysql.connection.cursor()
+		cur.execute('SELECT * FROM catedra')
+		data = cur.fetchall()
+		listaCursos = []
+
+		for i in data:
+
+			curso = {
+				"registro": i[0],
+				"código": i[1],
+			}
+
+			listaCursos.append(curso)
+
+		return jsonify(
+			{
+				"success": "true",
+				"msg": "Listado de Cursos en el Sistema"
+
+			},
+			listaCursos
+		)
+
+	except:
+
+		return jsonify(
+				{
+					"success": "false",
+					"msg": "Ocurrió un Error al envíar el listado de Cursos"
+				}
+			)
+	
 
 @app.route('/', methods=['GET'])
 def index():
