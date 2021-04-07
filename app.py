@@ -226,6 +226,47 @@ def modificar_usuario():
 			}
 		)	
 
+@app.route('/creacion-publicacion', methods=['POST'])
+def creacion_publicacion():
+	
+	if request.method == 'POST':
+
+		try:
+
+			identifier = request.json['identifier']
+			teacherIdentifier = request.json['teacherIdentifier']
+			idCurse = request.json['idCurse']
+			comment = request.json['comment']
+	
+
+			cur = mysql.connection.cursor()
+			cur.execute("""INSERT INTO Publicacion (cod_publicacion, Registro_académico, registro, codigo_curso)
+				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, teacherIdentifier, idCurse, comment))
+
+			mysql.connection.commit()
+
+			return jsonify(
+				{
+					"success": "true",
+					"msg": "Publicación Realizada con Éxito"
+
+				},
+				{
+					"identifier": identifier,
+					"teacherIdentifier": teacherIdentifier,
+					"idCurse": idCurse,
+					"comment": comment
+				}
+			)
+				
+		except:
+
+			return jsonify(
+				{
+					"success": "false",
+					"msg": "Ocurrió un error con la publicación"
+				}
+			)
 
 
 @app.route('/', methods=['GET'])
