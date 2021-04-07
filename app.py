@@ -97,29 +97,50 @@ def modificar_usuario():
 	
 	if request.method == 'POST':
 
-		identifier = request.args.get("identifier",None)
+		try:
 
-		names = request.json['names']
-		surNames = request.json['surNames']
-		email = request.json['email']
-		photoUrl = request.json['photoUrl']
-		password = request.json['password']
+			identifier = request.json['identifier']
+			names = request.json['names']
+			surNames = request.json['surNames']
+			email = request.json['email']
+			photoUrl = request.json['photoUrl']
+			password = request.json['password']
 
-		cur = mysql.connection.cursor()
-		cur.execute("""
-			UPDATE usuarios
-			SET names = %s,
-				surNames = %s,
-				email = %s,
-				photoUrl = %s,
-				password = %s
-			WHERE identifier = %s	
-			""", (names, surNames, email, photoUrl, password, identifier))
+			cur = mysql.connection.cursor()
+			cur.execute("""
+				UPDATE usuarios
+				SET names = %s,
+					surNames = %s,
+					email = %s,
+					photoUrl = %s,
+					password = %s
+				WHERE identifier = %s	
+				""", (names, surNames, email, photoUrl, password, identifier))
 
-		return {
-			"estado": "Exitoso"
-		}
+			mysql.connection.commit()
+			
+			return jsonify(
+				{
+					"success": "true",
+					"msg": "Actualizado el Usuario"
+				},
+				{
+					"identifier": identifier,
+					"names": names,
+					"surNames": surNames,
+					"email": email,
+					"photoUrl": photoUrl
+				}
+			)
+		
 
+		except:
+			return jsonify(
+			{
+				"success": "false",
+				"msg": "Ocurrió un Error"
+			}
+		)	
 
 
 
