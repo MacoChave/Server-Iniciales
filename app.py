@@ -103,27 +103,35 @@ def login():
 		identifier = request.json['identifier']
 		password = request.json['password']
 
-		
-		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM Usuario WHERE Registro_académico = "{0}"'.format(identifier))
-		data = cur.fetchall()
+		try:
+			cur = mysql.connection.cursor()
+			cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
+			data = cur.fetchall()
 
-		if data[0][5] == password:
+			if data[0][5] == password:
+
+				return jsonify(
+					{
+						"success": "true",
+						"msg": "Inicio Sesión: " + identifier
+					}
+				)
+		
+			return jsonify(
+				{
+					"success": "false",
+					"msg": "Contraseña Incorrecta"
+				}
+			)
+
+		except:
 
 			return jsonify(
 				{
-					"success": "true",
-					"msg": "Inicio Sesión: " + identifier
+					"success": "false",
+					"msg": "Usuario no Encontrado"
 				}
 			)
-		
-		return jsonify(
-			{
-					"success": "false",
-					"msg": "Contraseña Incorrecta"
-			}
-		)
-
 
 @app.route('/recuperar-cuenta', methods=['POST'])
 def recuperar_cuenta():
@@ -294,8 +302,6 @@ def listado_catedraticos():
 					"msg": "Ocurrió un Error al envíar el listado de Catedráticos"
 				}
 			)
-
-
 
 @app.route('/', methods=['GET'])
 def index():
