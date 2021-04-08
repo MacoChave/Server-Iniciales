@@ -105,7 +105,7 @@ def login():
 
 		
 		cur = mysql.connection.cursor()
-		cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
+		cur.execute('SELECT * FROM Usuario WHERE Registro_académico = "{0}"'.format(identifier))
 		data = cur.fetchall()
 
 		if data[0][5] == password:
