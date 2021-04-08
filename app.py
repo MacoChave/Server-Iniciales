@@ -1,19 +1,29 @@
+import json
+import mysql.connector as mysql
 from flask import Flask,request, jsonify
 from flask_cors import CORS
-from flask_mysqldb import MySQL
-import json
+# from flask_mysqldb import MySQL
 from datetime import date
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['MYSQL_HOST'] = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com'
-app.config['MYSQL_USER'] = 'iniciales'
-app.config['MYSQL_PASSWORD'] = 'iniciales'
-app.config['MYSQL_DB'] = 'db'
+# app.config['MYSQL_HOST'] = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com'
+# app.config['MYSQL_USER'] = 'iniciales'
+# app.config['MYSQL_PASSWORD'] = 'iniciales'
+# app.config['MYSQL_DB'] = 'db'
 
-mysql = MySQL(app)
+# mysql = MySQL(app)
+
+# def getConnection():
+# 	db = mysql.connect(
+# 		host = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com',
+# 		user = 'iniciales',
+# 		passwd = 'iniciales',
+# 		database = 'db'
+# 	)
+# 	return db.cursor()
 
 @app.route('/registro', methods=['POST'])
 def registro():
@@ -96,42 +106,52 @@ def perfil():
 
 @app.route('/login', methods=['POST'])
 def login():
+	data = json.loads(request.data)
+	print(data)
 
-	if request.method == 'POST':
+	db = mysql.connect(
+		host = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com',
+		user = 'iniciales',
+		passwd = 'iniciales',
+		database = 'db'
+	)
+	cur = db.cursor()
 
+	query = """SELECT
+				Registro_académico,
+				Nombres,
+				Apellidos,
+				Contraseña,
+				Correo_electrónico
+			FROM Usuario 
+			WHERE 
+				Registro_académico = %s AND
+				Contraseña LIKE %s"""
+	values = (data["identifier"], data["password"])
+	cur.execute(query, values)
+	data = cur.fetchall()
 
-		identifier = request.json['identifier']
-		password = request.json['password']
-
-		try:
-			cur = mysql.connection.cursor()
-			cur.execute('SELECT * FROM Usuario WHERE Registro_académico = {0}'.format(identifier))
-			data = cur.fetchall()
-
-			if data[0][5] == password:
-
-				return jsonify(
-					{
-						"success": "true",
-						"msg": "Inicio Sesión: " + identifier
-					}
-				)
-		
-			return jsonify(
-				{
-					"success": "false",
-					"msg": "Contraseña Incorrecta"
-				}
-			)
-
-		except:
-
-			return jsonify(
-				{
-					"success": "false",
-					"msg": "Usuario no Encontrado"
-				}
-			)
+	if cur.rowcount > 0:
+		return jsonify(
+			{
+				"success": "true",
+				"msg": "Usuario encontrado"
+			},
+			{
+				"Registro_académico": data[0][0],
+				"Nombre": data[0][1],
+				"Apellido": data[0][2],
+				"Contraseña": data[0][3],
+				"Correo_electrónico": data[0][4]
+			}
+		)
+	else:
+		return jsonify(
+			{
+				"success": "false",
+				"msg": "Usuario no encontrado"
+			}
+		)
 
 @app.route('/recuperar-cuenta', methods=['POST'])
 def recuperar_cuenta():
