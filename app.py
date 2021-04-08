@@ -1,5 +1,5 @@
 import json
-import mysql.connector as mysql
+import mysql.connector as mysql # pip install mysql-connector
 from flask import Flask,request, jsonify
 from flask_cors import CORS
 # from flask_mysqldb import MySQL
@@ -15,15 +15,6 @@ CORS(app)
 # app.config['MYSQL_DB'] = 'db'
 
 # mysql = MySQL(app)
-
-# def getConnection():
-# 	db = mysql.connect(
-# 		host = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com',
-# 		user = 'iniciales',
-# 		passwd = 'iniciales',
-# 		database = 'db'
-# 	)
-# 	return db.cursor()
 
 @app.route('/registro', methods=['POST'])
 def registro():
@@ -109,6 +100,7 @@ def login():
 	data = json.loads(request.data)
 	print(data)
 
+	# CONECTAR A BASE DE DATOS
 	db = mysql.connect(
 		host = 'iniciales.clqpka2rpvnz.us-west-2.rds.amazonaws.com',
 		user = 'iniciales',
@@ -117,6 +109,7 @@ def login():
 	)
 	cur = db.cursor()
 
+	# CONSULTA
 	query = """SELECT
 				Registro_académico,
 				Nombres,
