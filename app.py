@@ -13,7 +13,6 @@ app.config['MYSQL_USER'] = 'iniciales'
 app.config['MYSQL_PASSWORD'] = 'iniciales'
 app.config['MYSQL_DB'] = 'db'
 
-
 mysql = MySQL(app)
 
 @app.route('/registro', methods=['POST'])
@@ -228,85 +227,6 @@ def modificar_usuario():
 				"msg": "Ocurrió un Error"
 			}
 		)	
-
-@app.route('/creacion-publicacion', methods=['POST'])
-def creacion_publicacion():
-	
-	if request.method == 'POST':
-
-		try:
-
-			identifier = request.json['identifier']
-			teacherIdentifier = request.json['teacherIdentifier']
-			idCurse = request.json['idCurse']
-			msg = request.json['comment']
-		    dateToday = date.today()
-
-			cur = mysql.connection.cursor()
-			cur.execute("""INSERT INTO Publicacion (Registro_académico, registro, codigo_curso)
-				VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, teacherIdentifier, idCurse))
-
-			mysql.connection.commit()
-
-			return jsonify(
-				{
-					"success": "true",
-					"msg": "Publicación Realizada con Éxito"
-
-				},
-				{
-					"identifier": identifier,
-					"teacherIdentifier": teacherIdentifier,
-					"idCurse": idCurse,
-					"comment": comment
-				}
-			)
-				
-		except:
-
-			return jsonify(
-				{
-					"success": "false",
-					"msg": "Ocurrió un error con la publicación"
-				}
-			)
-
-@app.route('/crear-comentario', methods=['POST'])
-def crear_comentario():
-	
-	try:
-
-		identifier = request.json['identifier']
-		comment = request.json['comment']
-		dateToday = date.today()
-
-		cur = mysql.connection.cursor()
-		cur.execute("""INSERT INTO Comentario (Registro_académico, comentario, fecha)
-			VALUES(%s, %s, %s, %s, %s, %s)""",(identifier, comment, dateToday))
-
-		mysql.connection.commit()
-
-		return jsonify(
-			{
-				"success": "true",
-				"msg": "Comentario Realizada con Éxito"
-
-			},
-			{
-				"identifier": identifier,
-				"comment" = comment
-			}
-			)
-				
-		except:
-
-			return jsonify(
-				{
-					"success": "false",
-					"msg": "Ocurrió un error con agregar un nuevo comentario"
-				}
-			)
-
 
 
 @app.route('/listado-cursos', methods=['GET'])
